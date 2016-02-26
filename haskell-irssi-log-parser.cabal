@@ -1,0 +1,52 @@
+name:                haskell-irssi-log-parser
+version:             0.1.0.0
+synopsis:            Initial project template from stack
+description:         Please see README.md
+homepage:            http://github.com/adarqui/haskell-irssi-log-parser#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Andrew Darqui
+maintainer:          andrew.darqui@gmail.com
+copyright:           2016 Andrew Darqui
+category:            Development
+build-type:          Simple
+-- extra-source-files:
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  ghc-options:         -Wall
+  exposed-modules:     Parser.Irssi.Log
+                     , Parser.Irssi.Log.JSON
+                     , Parser.Irssi.Log.Regex
+                     , Parser.Irssi.Log.Types
+                     , Parser.Irssi.Log.Util.Import
+                     , Parser.Irssi.Log.Util.Export
+  build-depends:       base >= 4.7 && < 5
+                     , aeson
+                     , bytestring
+                     , regex-pcre
+                     , text
+                     , time
+                     , unordered-containers
+  default-language:    Haskell2010
+
+executable haskell-irssi-log-parser-exe
+  hs-source-dirs:      bin
+  main-is:             Main.hs
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       base
+                     , haskell-irssi-log-parser
+  default-language:    Haskell2010
+
+test-suite haskell-irssi-log-parser-test
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:       base, haskell-irssi-log-parser, tasty, tasty-hunit
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+
+source-repository head
+  type:     git
+  location: https://github.com/adarqui/haskell-irssi-log-parser
