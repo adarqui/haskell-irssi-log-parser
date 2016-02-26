@@ -10,10 +10,20 @@ Eventually this library will provide the following features:
 
 Right now i'm using the regex from node-irssi-log-parser to parse the irssi log file lines. Eventually i'll probably also provide Parsec functions.
 
+## Usage
+
+todo.
+
+## Building
+
+```
+stack build
+```
+
 ## Tests
 
 ```
-cabal install --enable-tests --only-dependencies && cabal configure --enable-tests && cabal build && cabal test
+stack test
 ```
 
 pc
