@@ -1,7 +1,6 @@
 module Parser.Irssi.Log.Util.Import (
   importJSONData,
   importJSONDataPure,
-  importIrssiData',
   importIrssiData,
   importIrssiDataPure
 ) where
@@ -72,12 +71,6 @@ importIrssiData' log_type = do
     go2 (h,m) e = do
       v <- get
       return (addUTCTime ((fromIntegral $ h*60*60) + (fromIntegral $ m*60)) v, e)
-
-
-
-importIrssiData'' log_type = do
-  st <- get
-  return (st, log_type)
 
 
 
