@@ -2,7 +2,8 @@
 {-# LANGUAGE RankNTypes       #-}
 
 module Parser.Irssi.Log.Regex (
-  parseIrssiLine,
+  parseIrssiLineBS,
+  parseIrssiLineText,
   logOpen,
   logClose,
   dayChange,
@@ -16,14 +17,20 @@ module Parser.Irssi.Log.Regex (
   mode,
   message,
   action,
-  offset
+  offset,
+  irssiTimestampToUTC,
+  irssiDayChangeTimestampToUTC
 ) where
+
+import           Data.Maybe                 (listToMaybe, mapMaybe)
 
 import qualified Data.ByteString.Lazy       as BSL
 import qualified Data.ByteString.Lazy.Char8 as BCL
 import           Data.Text                  (Text)
 import qualified Data.Text                  as T
+
 import           Data.Time
+import           Data.Time.Format
 
 import           Text.Regex.PCRE
 
@@ -34,15 +41,22 @@ import           Parser.Irssi.Log.Types
 
 -- | Parse irssi line
 --
-parseIrssiLine :: BSL.ByteString -> Either String LogType
-parseIrssiLine _ = undefined
+parseIrssiLineBS :: BSL.ByteString -> Either String LogType
+parseIrssiLineBS _ = undefined
+
+
+
+-- | Parse irssi line
+--
+parseIrssiLineText :: Text -> Maybe LogType
+parseIrssiLineText text = listToMaybe $ mapMaybe (\fn -> fn text) [message, logOpen, logClose, dayChange, join, part, quit, kick, nick, ownNick, nicks, mode, action]
 
 
 
 logOpen :: Text -> Maybe LogType
 logOpen text = do
   (_,time:[]) <- matcher text "^(---) Log opened (.*)$"
-  return $ LogOpen (t time)
+  return $ LogOpen (irssiTimestampToUTC time)
 
 
 
@@ -51,7 +65,7 @@ logOpen text = do
 logClose :: Text -> Maybe LogType
 logClose text = do
   (_,time:[]) <- matcher text "^(---) Log closed (.*)$"
-  return $ LogClose (t time)
+  return $ LogClose (irssiTimestampToUTC time)
 
 
 
@@ -60,7 +74,7 @@ logClose text = do
 dayChange :: Text -> Maybe LogType
 dayChange text = do
   (_,time:[]) <- matcher text "^(---) Day changed (.*)$"
-  return $ DayChange (t time)
+  return $ DayChange (irssiDayChangeTimestampToUTC time)
 
 
 
@@ -156,5 +170,16 @@ offset text = (read hh, read mm)
 
 
 
-t :: forall t. t -> UTCTime
-t _ = UTCTime (fromGregorian 0 0 0) 0
+-- |
+-- Fri Mar 04 09:10:30 2011
+--
+irssiTimestampToUTC :: Text -> UTCTime
+irssiTimestampToUTC = readTime defaultTimeLocale "%a %b %d %T %Y" . T.unpack
+
+
+
+-- | DayChange has a different format, lacks 00:00 offset
+-- Day changed Tue Feb 16 2016
+--
+irssiDayChangeTimestampToUTC :: Text -> UTCTime
+irssiDayChangeTimestampToUTC = readTime defaultTimeLocale "%a %b %d %Y" . T.unpack
