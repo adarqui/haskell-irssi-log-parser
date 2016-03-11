@@ -14,8 +14,8 @@ import           Data.Maybe                 (catMaybes)
 import           Data.Text                  (Text)
 import qualified Data.Text                  as T
 import qualified Data.Text.IO               as T
-
 import           Data.Time
+import           System.IO
 
 import           Parser.Irssi.Log.JSON      ()
 import           Parser.Irssi.Log.Regex
@@ -42,7 +42,10 @@ importJSONDataPure json_data = eitherDecode json_data :: Either String [LogType]
 -- | Import an irssi log file into a list of LogTypes
 --
 importIrssiData path = do
-  log_data <- T.lines <$> T.readFile path
+  h <- openFile path ReadMode
+  hSetEncoding h latin1
+  contents <- T.hGetContents h
+  let log_data = T.lines contents
   let log_types = catMaybes $ map parseIrssiLineText log_data
   evalStateT (mapM importIrssiData' log_types) (read "Fri Mar 04 09:10:30 2011" :: UTCTime)
 
@@ -77,4 +80,4 @@ importIrssiData' log_type = do
 -- | Import an irssi data into a list of LogTypes
 --
 importIrssiDataPure :: BSL.ByteString -> [LogType]
-importIrssiDataPure log_data = undefined
+importIrssiDataPure _ = undefined
