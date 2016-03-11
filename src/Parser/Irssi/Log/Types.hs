@@ -2,7 +2,19 @@
 
 module Parser.Irssi.Log.Types (
   LogType (..),
-  LogEntry
+  LogEntry,
+  Offset,
+  Nickname,
+  Mask,
+  Kicker,
+  Total,
+  Ops,
+  HalfOps,
+  Voices,
+  Normal,
+  Mode,
+  Moder,
+  MessageContent
 ) where
 
 import           Data.Text     (Text)
